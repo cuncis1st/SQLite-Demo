@@ -1,6 +1,8 @@
 package com.boss.cuncis.sqliteudemy;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -14,6 +16,40 @@ public class DatabaseAdapter {
     public DatabaseAdapter(Context context) {
         helper = new DatabaseHelper(context);
         db = helper.getWritableDatabase();
+    }
+
+    public String getAllData() {
+        String[] columns = {
+                DatabaseHelper.KEY_ROWID,
+                DatabaseHelper.KEY_NAME,
+                DatabaseHelper.KEY_EMAIL
+        };
+
+        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, columns, null, null, null, null, null, null);
+        StringBuffer buffer = new StringBuffer();
+        while (cursor.moveToNext()) {
+            int index1 = cursor.getColumnIndex(DatabaseHelper.KEY_ROWID);
+            int rowId = cursor.getInt(index1);
+
+            int index2 = cursor.getColumnIndex(DatabaseHelper.KEY_NAME);
+            String name = cursor.getString(index2);
+
+            int index3 = cursor.getColumnIndex(DatabaseHelper.KEY_EMAIL);
+            String email = cursor.getString(index3);
+
+            buffer.append(rowId + ". " + name + " - " + email);
+        }
+
+        return buffer.toString();
+    }
+
+    public long insertData(String name, String email) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.KEY_NAME, name);
+        values.put(DatabaseHelper.KEY_EMAIL, email);
+        long id = db.insert(DatabaseHelper.TABLE_NAME, null, values);
+
+        return id;
     }
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
