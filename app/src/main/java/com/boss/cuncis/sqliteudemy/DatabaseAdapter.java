@@ -18,6 +18,40 @@ public class DatabaseAdapter {
         db = helper.getWritableDatabase();
     }
 
+    public int deleteData(String name) {
+        String whereArgs[] = {name};
+        int count = db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.KEY_NAME + "=?", whereArgs);    //count row
+        return count;
+    }
+
+    public int updateEmail(String name, String email) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.KEY_EMAIL, email);
+        String whereArgs[] = {name};
+        int count = db.update(DatabaseHelper.TABLE_NAME, values, DatabaseHelper.KEY_NAME + "=?", whereArgs);
+
+        return count;
+    }
+
+    public String getData(String name) {
+        String colums[] = {DatabaseHelper.KEY_NAME, DatabaseHelper.KEY_EMAIL};
+//        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, colums, DatabaseHelper.KEY_NAME + " LIKE '%" +
+//                name + "%'", null, null, null,null);
+        String selectioinArgs[] = {name};
+        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, colums, DatabaseHelper.KEY_NAME + "=?",
+                selectioinArgs, null, null, null);
+        StringBuffer buffer = new StringBuffer();
+        while (cursor.moveToNext()) {
+            int index1 = cursor.getColumnIndex(DatabaseHelper.KEY_NAME);
+            int index2 = cursor.getColumnIndex(DatabaseHelper.KEY_EMAIL);
+            String namePerson = cursor.getString(index1);
+            String emailPerson = cursor.getString(index2);
+            buffer.append(namePerson + " - " + emailPerson);
+        }
+
+        return buffer.toString();
+    }
+
     public String getAllData() {
         String[] columns = {
                 DatabaseHelper.KEY_ROWID,
